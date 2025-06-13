@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Delta-Y Impedance Converter</title>
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 600px;
+      margin: 2em auto;
+      padding: 1em;
+      background: #f9f9f9;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    label, input {
+      display: block;
+      margin: 0.5em 0;
+    }
+    .row {
+      display: flex;
+      gap: 1em;
+    }
+    .row input {
+      flex: 1;
+    }
+    button {
+      margin-top: 1em;
+      padding: 0.5em 1em;
+      font-weight: bold;
+      background: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+    #output {
+      margin-top: 1em;
+      background: white;
+      padding: 1em;
+      border-radius: 5px;
+      white-space: pre-wrap;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <h2>Delta ↔ Y Network Converter</h2>
+
+  <label>Choose Network Type:</label>
+  <label><input type="radio" name="netType" value="delta" checked> Δ (Delta) → Y</label>
+  <label><input type="radio" name="netType" value="y"> Y → Δ (Delta)</label>
+
+  <div class="row">
+    <input id="z1" placeholder="Z1 (e.g., 4+3j)">
+    <input id="z2" placeholder="Z2 (e.g., 4+3j)">
+    <input id="z3" placeholder="Z3 (e.g., 4+3j)">
+  </div>
+
+  <label><input type="checkbox" id="balanced"> Balanced Load</label>
+
+  <button onclick="runPython()">Convert</button>
+
+  <div id="output">Result will appear here.</div>
+
+  <script>
+    let pyodideReadyPromise = loadPyodide();
+  
+    async function runPython() {
+      const pyodide = await pyodideReadyPromise;
+      const netType = document.querySelector('input[name="netType"]:checked').value;
+      const z1 = document.getElementById('z1').value.trim();
+      const z2 = document.getElementById('z2').value.trim();
+      const z3 = document.getElementById('z3').value.trim();
+      const balanced = document.getElementById('balanced').checked;
+  
+      // Smart handling of inputs
+      if (!z1) {
+        document.getElementById("output").textContent = "Z1 is required.";
+        return;
+      }
+  
+      let z2_final = z2;
+      let z3_final = z3;
+  
+      if (balanced) {
+        // Default z2 and z3 to z1 if blank
+        z2_final = z1; //z2 || z1;
+        z3_final = z1; //z3 || z1;
+      } else {
+        // All three values are required
+        if (!z2 || !z3) {
+          document.getElementById("output").textContent = "Please enter Z1, Z2, and Z3 for unbalanced loads.";
+          return;
+        }
+      }
+  
+      const script = await (await fetch("script.py")).text();
+  
+      pyodide.globals.set("network_type", netType);
+      pyodide.globals.set("z1_input", z1);
+      pyodide.globals.set("z2_input", z2_final);
+      pyodide.globals.set("z3_input", z3_final);
+      pyodide.globals.set("balanced", balanced);
+  
+      try {
+        const result = await pyodide.runPythonAsync(script + "\nconvert(network_type, z1_input, z2_input, z3_input, balanced)");
+        document.getElementById("output").textContent = result;
+      } catch (err) {
+        document.getElementById("output").textContent = "Error: " + err;
+      }
+    }
+  </script>
+  
+</body>
+</html>
