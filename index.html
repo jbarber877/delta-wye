@@ -62,7 +62,9 @@
 
   <button onclick="runPython()">Convert</button>
 
-  <a href="https://github.com/your-username/your-repo" target="_blank">
+  <button onclick="resetForm()">Try Again</button>
+  
+  <a href="https://github.com/jbarber877/delta-wye" target="_blank">
   <button>View Documentation</button>
   </a>
 
@@ -114,6 +116,15 @@
       } catch (err) {
         document.getElementById("output").textContent = "Error: " + err;
       }
+    }
+
+    function resetForm() {
+      document.getElementById('z1').value = '';
+      document.getElementById('z2').value = '';
+      document.getElementById('z3').value = '';
+      document.getElementById('balanced').checked = false;
+      document.querySelector('input[name="netType"][value="delta"]').checked = true;
+      document.getElementById('output').textContent = 'Result will appear here.';
     }
   </script>
   
