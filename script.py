@@ -9,7 +9,6 @@ def convert(network_type, z1_input, z2_input, z3_input, balanced):
     result = ""
 
     if balanced:
-        // z1 = z2 = z3
         if network_type == "delta": // convert to wye
             y_val = z1/3
             result += f"Balanced Δ to Y:\nY1 = Y2 = Y3 = {y_val:.3f}"
