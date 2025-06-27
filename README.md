@@ -8,3 +8,6 @@ This calculator uses Python running in the browser (via Pyodide) to perform Delt
 Next, the user enter the **three complex impedance values** (Z₁, Z₂, Z₃) into text fields. These values are expressed in Python complex number format (e.g., `3+4j`). Alternatively, if the user selects **"Balanced Load"**, only z1 needs to be entered and the calculator will assume all impedances are equal.
 
 When the user clicks "Convert", the app reads the selected configuration and impedance values from the input fields. It passes them into a Python script that performs the appropriate conversion. The result is displayed as text output on the page.
+
+
+image taken from https://www.circuitbread.com/
